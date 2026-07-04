@@ -4,10 +4,10 @@
     "slug": "jarina-khatoon",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "https://via.placeholder.com/1024.png?text=JK",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "https://via.placeholder.com/1024.png?text=JK",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -22,12 +22,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "https://via.placeholder.com/1024.png?text=JK",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       }
     },
     "web": {
-      "favicon": "https://via.placeholder.com/512.png?text=JK"
+      "favicon": "./assets/icon.png"
     }
   }
 }
