@@ -8,6 +8,9 @@ workflows:
         PACKAGE_NAME: "com.hasanbabu.clinic"
     working_directory: mobile_app
     scripts:
+      - name: Recreate Android platform files
+        script: |
+          flutter create --platforms=android --org com.hasanbabu .
       - name: Get Flutter packages
         script: |
           flutter packages pub get
