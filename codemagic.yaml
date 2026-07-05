@@ -1,0 +1,18 @@
+workflows:
+  android-workflow:
+    name: Hasan Babu Clinic Android Build
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      vars:
+        PACKAGE_NAME: "com.hasanbabu.clinic"
+    working_directory: mobile_app
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Build APK
+        script: |
+          flutter build apk --release
+    artifacts:
+      - mobile_app/build/**/outputs/**/*.apk
