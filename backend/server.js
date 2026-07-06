@@ -25,8 +25,7 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server chal raha hai: http://localhost:${PORT}`);
-});
-    
 
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server chal raha hai on port ${PORT}`);
+});
