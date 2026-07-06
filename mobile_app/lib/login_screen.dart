@@ -1,10 +1,10 @@
 import 'patient_registration.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'config/api_config.dart';
 import 'reception_dashboard.dart';
+import 'services/network_service.dart';
 
 // Ye ek hi login screen hai - Doctor, Reception, Pharmacy, Admin
 // sabhi isi se login karte hain. Role backend se aata hai.
@@ -36,15 +36,21 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final response = await http.post(
-        Uri.parse(ApiConfig.login),
+      print('🔐 Login attempt for user: $username');
+      
+      final response = await NetworkService.post(
+        ApiConfig.login,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'username': username, 'password': password}),
       );
 
+      if (!mounted) return;
+
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data['success'] == true) {
+        print('✅ Login successful for user: $username');
+        
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', data['token']);
         await prefs.setString('role', data['user']['role']);
@@ -56,12 +62,17 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (_) => const ReceptionDashboard()),
         );
       } else {
+        print('❌ Login failed: ${data['message']}');
         setState(() => _errorMessage = data['message'] ?? "Login fail ho gaya.");
       }
     } catch (e) {
-      setState(() => _errorMessage = "Server se connect nahi ho paaya. Internet check karein.");
+      print('❌ Login error: $e');
+      final errorMsg = NetworkService.getErrorMessage(e);
+      setState(() => _errorMessage = errorMsg);
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -101,6 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           prefixIcon: Icon(Icons.person),
                           border: OutlineInputBorder(),
                         ),
+                        enabled: !_isLoading,
                       ),
                       const SizedBox(height: 16),
                       TextField(
@@ -111,34 +123,98 @@ class _LoginScreenState extends State<LoginScreen> {
                           prefixIcon: Icon(Icons.lock),
                           border: OutlineInputBorder(),
                         ),
+                        enabled: !_isLoading,
                       ),
                       const SizedBox(height: 16),
                       if (_errorMessage != null)
-                        Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            border: Border.all(color: Colors.red.shade300),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.error_outline, color: Colors.red.shade700),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  _errorMessage!,
+                                  style: TextStyle(
+                                    color: Colors.red.shade700,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       const SizedBox(height: 16),
                       SizedBox(
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _login,
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.teal,
+                            disabledBackgroundColor: Colors.grey.shade400,
+                          ),
                           child: _isLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
-                              : const Text("Login", style: TextStyle(fontSize: 16, color: Colors.white)),
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  "Login",
+                                  style: TextStyle(fontSize: 16, color: Colors.white),
+                                ),
                         ),
                       ),
                       const SizedBox(height: 16),
                       TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const PatientRegistrationScreen()),
-                          );
-                        },
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const PatientRegistrationScreen(),
+                                  ),
+                                );
+                              },
                         child: const Text("नया खाता बनाएँ (Sign Up)"),
                       ),
                     ],
                   ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  border: Border.all(color: Colors.blue.shade300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.blue.shade700, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Demo: username: admin, password: admin123',
+                        style: TextStyle(
+                          color: Colors.blue.shade700,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -146,5 +222,12 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
