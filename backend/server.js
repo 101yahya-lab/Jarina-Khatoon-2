@@ -8,9 +8,9 @@ const patientRoutes = require('./routes/patientRoutes');
 
 const app = express();
 
-// ============================================================
-// CORS Configuration - Hospital Network के liye optimized
-// ============================================================
+// ========================================
+// CORS Configuration - Hospital Network ke liye optimized
+// ========================================
 const corsOptions = {
   origin: function (origin, callback) {
     // Saari requests ko allow karo (hospital network ke liye)
@@ -25,9 +25,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // Preflight requests ke liye
 
-// ============================================================
+// ========================================
 // डेटाबेस कनेक्शन
-// ============================================================
+// ========================================
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -64,14 +64,14 @@ connection.on('error', (err) => {
   if (err.code === 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR') {
     console.error('डेटाबेस में fatal error है!');
   }
-  if (err.code === 'PROTOCOL_ENQUEUE_AFTER_CLOSE') {
+  if (err.code === 'PROTOCOL_ENQUEUE_AFTER_FATAL_CLOSE') {
     console.error('डेटाबेस कनेक्शन बंद है!');
   }
 });
 
-// ============================================================
+// ========================================
 // Middleware
-// ============================================================
+// ========================================
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.static('public'));
@@ -81,12 +81,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// ============================================================
+// ========================================
 // Health Check Routes
-// ============================================================
+// ========================================
 app.get('/', (req, res) => {
-  res.json({ 
-    success: true, 
+  res.json({
+    success: true,
     message: 'Hasan Babu Ka Aspataal API chal raha hai.',
     timestamp: new Date(),
     status: 'online'
@@ -94,22 +94,42 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res.json({ 
-    success: true, 
+  res.json({
+    success: true,
     message: 'Server healthy hai',
     timestamp: new Date()
   });
 });
 
-// ============================================================
+app.get('/create-first-admin', async (req, res) => {
+  try {
+    const port = process.env.PORT || 5000;
+    const response = await fetch(`http://localhost:${port}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name: 'Admin',
+        username: 'admin',
+        password: 'Hasan@2026Aspatal',
+        role: 'admin'
+      })
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error: ' + err.message });
+  }
+});
+
+// ========================================
 // Routes
-// ============================================================
+// ========================================
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
 
-// ============================================================
+// ========================================
 // Error Handling Middleware
-// ============================================================
+// ========================================
 app.use((err, req, res, next) => {
   console.error('❌ Server Error:', err);
   res.status(500).json({
@@ -119,9 +139,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ============================================================
+// ========================================
 // 404 Handler
-// ============================================================
+// ========================================
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -129,18 +149,18 @@ app.use((req, res) => {
   });
 });
 
-// ============================================================
+// ========================================
 // सर्वर चालू करना
-// ============================================================
+// ========================================
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 app.listen(PORT, HOST, () => {
   console.log(`\n${'='.repeat(60)}`);
-  console.log(`✅ Server चल रहा है!`);
-  console.log(`🌐 URL: http://${HOST}:${PORT}`);
-  console.log(`📱 API Endpoint: http://${HOST}:${PORT}/api`);
-  console.log(`💚 Health Check: http://${HOST}:${PORT}/health`);
+  console.log(`🚀 Server chal raha hai!`);
+  console.log(`📡 URL: http://${HOST}:${PORT}`);
+  console.log(`🏥 API Endpoint: http://${HOST}:${PORT}/api`);
+  console.log(`❤️  Health Check: http://${HOST}:${PORT}/health`);
   console.log(`${'='.repeat(60)}\n`);
 });
 
