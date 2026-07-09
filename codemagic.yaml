@@ -1,32 +1,38 @@
     - name: Configure Android Manifest
       script: |
         python3 - <<'PYEOF'
-        import re
+        import os
         path = "android/app/src/main/AndroidManifest.xml"
-        with open(path, "r") as f:
-            content = f.read()
+        
+        if os.path.exists(path):
+            with open(path, "r") as f:
+                content = f.read()
 
-        # 1. Internet Permission Add करें
-        if "android.permission.INTERNET" not in content:
-            content = content.replace("<manifest", "<manifest xmlns:tools=\"http://schemas.android.com/tools\"")
-            content = content.replace(">", ">\n    <uses-permission android:name=\"android.permission.INTERNET\" />", 1)
+            # 1. Add Internet Permission
+            if "android.permission.INTERNET" not in content:
+                content = content.replace("<manifest", '<manifest xmlns:tools="http://schemas.android.com/tools"')
+                content = content.replace(">", '>\n    <uses-permission android:name="android.permission.INTERNET" />', 1)
 
-        # 2. Queries Add करें (कॉल/व्हाट्सएप के लिए)
-        queries_block = """
-        <queries>
-            <intent>
-                <action android:name="android.intent.action.VIEW" />
-                <data android:scheme="https" />
-            </intent>
-            <intent>
-                <action android:name="android.intent.action.DIAL" />
-            </intent>
-        </queries>
-        """
-        if "<queries>" not in content:
-            content = re.sub(r'(<application.*?>)', queries_block + r'\n\1', content, flags=re.DOTALL)
+            # 2. Add Queries (Call/WhatsApp)
+            queries_block = """
+            <queries>
+                <intent>
+                    <action android:name="android.intent.action.VIEW" />
+                    <data android:scheme="https" />
+                </intent>
+                <intent>
+                    <action android:name="android.intent.action.DIAL" />
+                </intent>
+            </queries>
+            """
             
-        with open(path, "w") as f:
-            f.write(content)
-        print("AndroidManifest successfully updated!")
+            if "<queries>" not in content:
+                # सीधे <application> के ऊपर जोड़ देगा
+                content = content.replace("<application", queries_block + "\n\n    <application")
+
+            with open(path, "w") as f:
+                f.write(content)
+            print("AndroidManifest successfully updated!")
+        else:
+            print("Error: AndroidManifest.xml file not found at " + path)
         PYEOF
