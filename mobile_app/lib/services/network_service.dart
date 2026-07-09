@@ -18,11 +18,11 @@ class NetworkService {
     required String body,
   }) async {
     print('🔄 POST Request: $url');
-    
+
     for (int attempt = 1; attempt <= _retryAttempts; attempt++) {
       try {
         print('📤 Attempt $attempt of $_retryAttempts...');
-        
+
         final response = await http
             .post(
               Uri.parse(url),
@@ -47,7 +47,7 @@ class NetworkService {
             continue;
           }
         }
-        
+
         return response;
       } on TimeoutException catch (e) {
         print('⏱️  Timeout on attempt $attempt: $e');
@@ -72,7 +72,7 @@ class NetworkService {
         rethrow;
       }
     }
-    
+
     throw Exception('Failed after $_retryAttempts attempts');
   }
 
@@ -82,11 +82,11 @@ class NetworkService {
     required Map<String, String> headers,
   }) async {
     print('🔄 GET Request: $url');
-    
+
     for (int attempt = 1; attempt <= _retryAttempts; attempt++) {
       try {
         print('📥 Attempt $attempt of $_retryAttempts...');
-        
+
         final response = await http
             .get(
               Uri.parse(url),
@@ -110,7 +110,7 @@ class NetworkService {
             continue;
           }
         }
-        
+
         return response;
       } on TimeoutException catch (e) {
         print('⏱️  Timeout on attempt $attempt: $e');
@@ -135,7 +135,7 @@ class NetworkService {
         rethrow;
       }
     }
-    
+
     throw Exception('Failed after $_retryAttempts attempts');
   }
 
@@ -146,7 +146,7 @@ class NetworkService {
       'Accept': 'application/json',
       'User-Agent': 'HassanBabuHospital/1.0',
     };
-    
+
     defaultHeaders.addAll(headers);
     return defaultHeaders;
   }
