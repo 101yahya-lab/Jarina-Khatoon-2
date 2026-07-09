@@ -1,6 +1,7 @@
-const pool = require('../config/db');
+const pool = require('../config/db'); // 'Const' को 'const' किया
 
 // POST /api/opd/checkin  { patient_id, complaint }
+// मरीज को OPD लाइन में लगाने और टोकन देने के लिए
 async function checkinPatient(req, res) {
   try {
     const { patient_id, complaint } = req.body;
@@ -8,10 +9,11 @@ async function checkinPatient(req, res) {
       return res.status(400).json({ success: false, message: 'Patient ID zaroori hai.' });
     }
 
+    // COUNT(*) की जगह MAX(token_number) किया ताकि टोकन नंबर कभी आपस में न टकराएं
     const [tokenRows] = await pool.query(
-      `SELECT COUNT(*) AS total FROM opd_visits WHERE visit_date = CURDATE()`
+      `SELECT MAX(token_number) AS max_token FROM opd_visits WHERE visit_date = CURDATE()`
     );
-    const nextToken = tokenRows[0].total + 1;
+    const nextToken = (tokenRows[0].max_token || 0) + 1;
 
     const [result] = await pool.query(
       `INSERT INTO opd_visits (patient_id, token_number, complaint, status)
@@ -32,6 +34,7 @@ async function checkinPatient(req, res) {
 }
 
 // GET /api/opd/queue
+// आज के उन मरीजों की लिस्ट जो अभी डॉक्टर का इंतजार कर रहे हैं
 async function getQueue(req, res) {
   try {
     const [rows] = await pool.query(
@@ -50,6 +53,7 @@ async function getQueue(req, res) {
 }
 
 // PUT /api/opd/:visit_id/prescription  { diagnosis, prescription }
+// डॉक्टर द्वारा मरीज का पर्चा और बीमारी सेव करने के लिए
 async function savePrescription(req, res) {
   try {
     const { visit_id } = req.params;
