@@ -1,9 +1,13 @@
- import 'dart:convert';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'config/api_config.dart';
-import
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 
+import 'config/api_config.dart';
+import 'services/network_service.dart';
 'services/network_service.dart';
 
 class PatientRegistrationScreen extends StatefulWidget {
