@@ -7,13 +7,14 @@ class ApiConfig {
 
   // Authentication Endpoints
   static const String login = "$baseUrl/auth/login";
-  static const String register = "$baseUrl/call/register"; // बैकएंड के /api/auth/register से मैच है
+  // 💡 यहाँ सुधार किया गया है: /call/register को सही राउट /auth/register से बदल दिया है
+  static const String register = "$baseUrl/auth/register"; 
 
   // Patient Management Endpoints
   static const String patients = "$baseUrl/patients";
   static const String todayQueue = "$baseUrl/patients/today-queue";
   
-  // 💡 सुझाव: किसी मरीज की प्रोफाइल HBA ID से देखने के लिए इसे जोड़ा गया है
+  // किसी मरीज की प्रोफाइल HBA ID से देखने के लिए
   static String getPatientDetails(String hbaId) => "$baseUrl/patients/$hbaId";
 
   // OPD & Token Management Endpoints
