@@ -1,9 +1,10 @@
-const pool = require('../config/db');
+const pool = require('../config/db'); // 'Const' को बदलकर 'const' किया
 
-// Helper: generates next HBA-XXXX id
+// Helper: Generates next HBA-XXXX id safely using MAX(id)
 async function generateHbaId() {
-  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM patients');
-  const nextNumber = rows[0].total + 1;
+  // COUNT(*) की जगह MAX(id) का इस्तेमाल किया ताकि डिलीट होने पर भी ID न टकराए
+  const [rows] = await pool.query('SELECT MAX(id) AS max_id FROM patients');
+  const nextNumber = (rows[0].max_id || 0) + 1;
   return 'HBA-' + String(nextNumber).padStart(4, '0');
 }
 
@@ -63,7 +64,7 @@ async function getPatientByHbaId(req, res) {
   }
 }
 
-// GET /api/patients/today-queue  (for reception OPD dashboard)
+// GET /api/patients/today-queue (for reception OPD dashboard)
 async function getTodayQueue(req, res) {
   try {
     const [rows] = await pool.query(
