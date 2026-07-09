@@ -16,7 +16,7 @@ class NetworkService {
     return await _request(url, method: 'POST', headers: headers, body: body);
   }
 
-  /// PUT request (यह वाला मिसिंग था, अब जुड़ गया है)
+  /// PUT request
   static Future<http.Response> put(String url, {required Map<String, String> headers, required String body}) async {
     return await _request(url, method: 'PUT', headers: headers, body: body);
   }
