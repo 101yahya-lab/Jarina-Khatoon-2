@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express'); // 'Const' को बदलकर 'const' किया
 const router = express.Router();
 const { register, login } = require('../controllers/authController');
 
