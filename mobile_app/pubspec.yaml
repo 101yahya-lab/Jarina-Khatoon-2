@@ -14,9 +14,13 @@ dependencies:
   shared_preferences: ^2.2.3
   cupertino_icons: ^1.0.6
 
+  # मीडिया और परमिशन्स के लिए पैकेज
   image_picker: ^1.1.2
   file_picker: ^8.0.7
   permission_handler: ^11.3.1
+
+  # 💡 तारीख और समय को सही से दिखाने (Date Formatting) के लिए आवश्यक पैकेज
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -25,5 +29,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  # 💡 एसेट्स को सही फ़ोल्डर स्ट्रक्चर के साथ व्यवस्थित किया
   assets:
-    - pexels-emreayata-34360150.jpg
+    - assets/images/
