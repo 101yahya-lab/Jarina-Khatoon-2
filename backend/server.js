@@ -29,18 +29,16 @@ app.options('*', cors(corsOptions)); // Preflight requests ke liye
 // ========================================
 // डेटाबेस कनेक्शन
 // ========================================
-const connection = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelayMs: 0
-});
+(async () => {
+  try {
+    const conn = await pool.getConnection();
+    console.log('✅ Database Connected Successfully');
+    conn.release();
+  } catch (err) {
+    console.error('❌ Database Connection Failed:', err.message);
+    process.exit(1);
+  }
+})();
 
 // कनेक्शन चेक करना
 connection.connect((err) => {
