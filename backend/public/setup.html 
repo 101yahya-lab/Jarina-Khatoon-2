@@ -33,7 +33,9 @@ button.secondary { background: #2a2e38; }
 <label>Username</label>
 <input type="text" id="username" value="admin" />
 <label>Password</label>
-<input type="text" id="password" value="Hasan@2026Aspatal" />
+<input type="password" id="password" placeholder="Apna password likhein" /> <!-- Security: type="password" kiya -->
+<label>Phone Number (Optional)</label>
+<input type="text" id="phone" placeholder="Mobile number likhein" /> <!-- Phone field joda -->
 <label>Role</label>
 <select id="role">
 <option value="admin">Admin</option>
@@ -61,6 +63,7 @@ const body = {
 full_name: document.getElementById('fullName').value,
 username: document.getElementById('username').value,
 password: document.getElementById('password').value,
+phone: document.getElementById('phone').value || null, // Phone joda
 role: document.getElementById('role').value
 };
 try {
