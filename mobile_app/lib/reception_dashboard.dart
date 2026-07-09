@@ -6,6 +6,7 @@ import 'config/api_config.dart';
 import 'patient_registration.dart';
 import 'login_screen.dart';
 import 'screens/checkin_screen.dart';
+import 'screens/doctor_dashboard.dart';
 
 class ReceptionDashboard extends StatefulWidget {
   const ReceptionDashboard({super.key});
@@ -66,6 +67,8 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final bool showDoctorAccess = _role == 'admin' || _role == 'doctor';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("रिसेप्शन डैशबोर्ड"),
@@ -131,6 +134,27 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                 ),
               ),
             ),
+            if (showDoctorAccess)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const DoctorDashboard()),
+                      ).then((_) => _fetchQueue());
+                    },
+                    icon: const Icon(Icons.medical_services),
+                    label: const Text("Doctor Dashboard खोलें"),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.indigo,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                  ),
+                ),
+              ),
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: Align(
