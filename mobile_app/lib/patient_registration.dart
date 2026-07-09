@@ -1,8 +1,10 @@
-import 'dart:convert';
+ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'config/api_config.dart';
-import 'services/network_service.dart';
+import
+
+'services/network_service.dart';
 
 class PatientRegistrationScreen extends StatefulWidget {
   const PatientRegistrationScreen({super.key});
