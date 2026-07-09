@@ -40,7 +40,70 @@ class NetworkService {
           print('✅ POST Success: $url');
           return response;
         } else if (response.statusCode >= 500) {
-          // Server error - retry
+          print('⚠️  Server error (${response.statusCode}) - Retrying...');
+          if (attempt < _retryAttempts) {
+            await Future.delayed(Duration(milliseconds: _retryDelayMs));
+            continue;
+          }
+        }
+
+        return response;
+      } on TimeoutException catch (e) {
+        print('⏱️  Timeout on attempt $attempt: $e');
+        if (attempt < _retryAttempts) {
+          await Future.delayed(Duration(milliseconds: _retryDelayMs));
+          continue;
+        }
+        rethrow;
+      } on SocketException catch (e) {
+        print('🌐 Network error on attempt $attempt: $e');
+        if (attempt < _retryAttempts) {
+          await Future.delayed(Duration(milliseconds: _retryDelayMs));
+          continue;
+        }
+        rethrow;
+      } catch (e) {
+        print('❌ Error on attempt $attempt: $e');
+        if (attempt < _retryAttempts) {
+          await Future.delayed(Duration(milliseconds: _retryDelayMs));
+          continue;
+        }
+        rethrow;
+      }
+    }
+
+    throw Exception('Failed after $_retryAttempts attempts');
+  }
+
+  /// 💡 PUT request - पर्चा सेव करने और डेटा अपडेट करने के लिए (Missing Method Fixed)
+  static Future<http.Response> put(
+    String url, {
+    required Map<String, String> headers,
+    required String body,
+  }) async {
+    print('🔄 PUT Request: $url');
+
+    for (int attempt = 1; attempt <= _retryAttempts; attempt++) {
+      try {
+        print('📤 Attempt $attempt of $_retryAttempts...');
+
+        final response = await http
+            .put(
+              Uri.parse(url),
+              headers: _addDefaultHeaders(headers),
+              body: body,
+            )
+            .timeout(
+              Duration(seconds: _timeoutSeconds),
+              onTimeout: () {
+                throw TimeoutException('Request timeout after $_timeoutSeconds seconds');
+              },
+            );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          print('✅ PUT Success: $url');
+          return response;
+        } else if (response.statusCode >= 500) {
           print('⚠️  Server error (${response.statusCode}) - Retrying...');
           if (attempt < _retryAttempts) {
             await Future.delayed(Duration(milliseconds: _retryDelayMs));
@@ -103,7 +166,6 @@ class NetworkService {
           print('✅ GET Success: $url');
           return response;
         } else if (response.statusCode >= 500) {
-          // Server error - retry
           print('⚠️  Server error (${response.statusCode}) - Retrying...');
           if (attempt < _retryAttempts) {
             await Future.delayed(Duration(milliseconds: _retryDelayMs));
