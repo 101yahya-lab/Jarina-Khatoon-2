@@ -1,10 +1,9 @@
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs'); // 'Const' को 'const' किया
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 require('dotenv').config();
 
 // POST /api/auth/register
-// Kisi bhi role ka naya user banane ke liye (Doctor/Reception/Pharmacy/Admin)
 async function register(req, res) {
   try {
     const { full_name, username, password, role, phone } = req.body;
@@ -25,6 +24,7 @@ async function register(req, res) {
 
     const password_hash = await bcrypt.hash(password, 10);
 
+    // नोट: डेटाबेस में 'is_active' का DEFAULT 1 होना जरूरी है
     const [result] = await pool.query(
       'INSERT INTO users (full_name, username, password_hash, role, phone) VALUES (?, ?, ?, ?, ?)',
       [full_name, username, password_hash, role, phone || null]
@@ -42,7 +42,6 @@ async function register(req, res) {
 }
 
 // POST /api/auth/login
-// Sabhi roles (doctor, reception, pharmacy, admin) isi ek endpoint se login karte hain
 async function login(req, res) {
   try {
     const { username, password } = req.body;
