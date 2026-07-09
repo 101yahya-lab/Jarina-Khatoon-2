@@ -1,4 +1,4 @@
-pluginManagement {
+pluginManagement { // 💡 'P' को छोटा 'p' किया ताकि ग्रैडल एरर न दे
     def flutterSdkPath = {
         def properties = new Properties()
         file("local.properties").withInputStream { properties.load(it) }
