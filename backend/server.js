@@ -29,7 +29,7 @@ app.options('*', cors(corsOptions)); // Preflight requests ke liye
 // ========================================
 // डेटाबेस कनेक्शन
 // ========================================
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
