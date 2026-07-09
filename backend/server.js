@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express'); // 'Const' को बदलकर 'const' किया
 const pool = require('./config/db');
 const cors = require('cors');
 require('dotenv').config();
@@ -27,12 +27,12 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // Preflight requests ke liye
 
 // ========================================
-// डेटाबेस कनेक्शन
+// डेटाबेस कनेक्शन (Pool Verification)
 // ========================================
 (async () => {
   try {
     const conn = await pool.getConnection();
-    console.log('✅ Database Connected Successfully');
+    console.log('✅ Database Connected Successfully (Pool Active)');
     conn.release();
   } catch (err) {
     console.error('❌ Database Connection Failed:', err.message);
@@ -40,41 +40,16 @@ app.options('*', cors(corsOptions)); // Preflight requests ke liye
   }
 })();
 
-// कनेक्शन चेक करना
-connection.connect((err) => {
-  if (err) {
-    console.error('❌ डेटाबेस जुड़ने में दिक्कत आई: ' + err.stack);
-    console.error('डेटाबेस की जानकारी:');
-    console.error('Host:', process.env.DB_HOST);
-    console.error('User:', process.env.DB_USER);
-    console.error('Database:', process.env.DB_NAME);
-    console.error('Port:', process.env.DB_PORT);
-    return;
-  }
-  console.log('✅ मुबारक हो! डेटाबेस से जुड़ गए हैं।');
-});
-
-// Connection error handler
-connection.on('error', (err) => {
-  console.error('डेटाबेस कनेक्शन एरर:', err);
-  if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-    console.error('डेटाबेस कनेक्शन खो गया!');
-  }
-  if (err.code === 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR') {
-    console.error('डेटाबेस में fatal error है!');
-  }
-  if (err.code === 'PROTOCOL_ENQUEUE_AFTER_FATAL_CLOSE') {
-    console.error('डेटाबेस कनेक्शन बंद है!');
-  }
-});
+// (नोट: यहाँ से क्रैश करने वाले पुराने connection.connect और connection.on ब्लॉक हटा दिए गए हैं)
 
 // ========================================
 // Middleware
 // ========================================
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-app.use(express.static('public'));
-// Request logging middleware
+app.use(express.static('public')); // यह आपकी public फोल्डर की HTML फाइलों को चलाएगा
+
+// Request logging middleware (Termianl me live request dekhne ke liye)
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
@@ -100,28 +75,8 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.get('/create-first-admin', async (req, res) => {
-  try {
-    const port = process.env.PORT || 5000;
-    const response = await fetch(`http://localhost:${port}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        full_name: 'Admin',
-        username: 'admin',
-        password: 'Hasan@2026Aspatal',
-        role: 'admin'
-      })
-    });
-    const data = await response.json();
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error: ' + err.message });
-  }
-});
-
 // ========================================
-// Routes
+// Routes Application
 // ========================================
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
@@ -140,12 +95,12 @@ app.use((err, req, res, next) => {
 });
 
 // ========================================
-// 404 Handler
+// 404 Handler (Galat URL ke liye)
 // ========================================
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Ye endpoint nahi milha'
+    message: 'Ye endpoint nahi mila'
   });
 });
 
