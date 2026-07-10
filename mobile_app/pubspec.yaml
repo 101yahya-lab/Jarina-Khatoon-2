@@ -1,29 +1,11 @@
-name: hasan_babu_clinic
-description: Hasan Babu Ka Aspataal - Clinic Management Mobile App
-publish_to: 'none'
-version: 1.0.0+1
-
-environment:
-  sdk: '>=3.0.0 <4.0.0'
-
 dependencies:
   flutter:
     sdk: flutter
 
-  http: ^1.2.1
-  shared_preferences: ^2.2.3
-  cupertino_icons: ^1.0.6
-  image_picker: ^1.1.2
-  file_picker: ^8.0.7
-  permission_handler: ^11.3.1
-  intl: ^0.19.0
-  url_launcher: ^6.3.0
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
-flutter:
-  uses-material-design: true
-  assets:
-    - assets/images/
+  http: any
+  shared_preferences: any
+  cupertino_icons: any
+  image_picker: any
+  file_picker: any
+  permission_handler: any
+  
