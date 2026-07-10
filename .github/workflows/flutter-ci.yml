@@ -1,0 +1,48 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.10.0'
+        channel: 'stable'
+    
+    - name: Clean Cache
+      working-directory: mobile_app
+      run: |
+        flutter clean
+        rm -rf pubspec.lock
+    
+    - name: Get Dependencies
+      working-directory: mobile_app
+      run: flutter pub get
+    
+    - name: Analyze Code
+      working-directory: mobile_app
+      run: flutter analyze
+    
+    - name: Run Tests
+      working-directory: mobile_app
+      run: flutter test --coverage
+    
+    - name: Build APK
+      working-directory: mobile_app
+      run: flutter build apk --release
+    
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-release.apk
+        path: mobile_app/build/app/outputs/apk/release/app-release.apk
