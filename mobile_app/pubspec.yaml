@@ -1,0 +1,17 @@
+name: mobile_app
+description: A new Flutter project.
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: any
+  shared_preferences: any
+  cupertino_icons: any
+  image_picker: any
+  file_picker: any
+  permission_handler: any
+
+flutter:
+  uses-material-design: true
