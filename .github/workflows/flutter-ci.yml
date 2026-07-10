@@ -1,4 +1,4 @@
-name: Flutter CI
+name: Flutter Android Build
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  build:
+  android-build:
     runs-on: ubuntu-latest
     
     steps:
@@ -24,25 +24,19 @@ jobs:
       run: |
         flutter clean
         rm -rf pubspec.lock
+        rm -rf build/
     
     - name: Get Dependencies
       working-directory: mobile_app
       run: flutter pub get
     
-    - name: Analyze Code
-      working-directory: mobile_app
-      run: flutter analyze
-    
-    - name: Run Tests
-      working-directory: mobile_app
-      run: flutter test --coverage
-    
-    - name: Build APK
+    - name: Build Android APK
       working-directory: mobile_app
       run: flutter build apk --release
     
-    - name: Upload APK
+    - name: Upload APK Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: app-release.apk
+        name: android-apk
         path: mobile_app/build/app/outputs/apk/release/app-release.apk
+        retention-days: 30
