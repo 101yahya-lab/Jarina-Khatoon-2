@@ -1,38 +1,17 @@
 workflows:
   android-workflow:
-    name: Build Android APK
-    instance_type: mac_mini
-    max_build_duration: 120
-    triggering:
-      events:
-        - push
-        - pull_request
-      branch:
-        include_patterns:
-          - main
-          - develop
+    name: Hasan Babu Clinic Android Build
     environment:
       flutter: stable
-      java: 11
-      android_sdk: 33
     scripts:
-      - name: Clean Flutter Cache
+      - name: Generate missing platform folders
         working_directory: mobile_app
-        script: |
-          flutter clean
-          rm -rf pubspec.lock
-          rm -rf build/
-      - name: Get Flutter Dependencies
+        script: flutter create . --platforms=android
+      - name: Flutter pub get
         working_directory: mobile_app
-        script: |
-          flutter pub get
+        script: flutter pub get
       - name: Build Android APK
         working_directory: mobile_app
-        script: |
-          flutter build apk --release --verbose
+        script: flutter build apk --release
     artifacts:
-      - mobile_app/build/app/outputs/apk/release/app-release.apk
-    publishing:
-      slack:
-        channel: '#builds'
-        notify_on_build_start: true
+      - mobile_app/build/app/outputs/**/*.apk
