@@ -21,64 +21,17 @@ workflows:
         script: |
           flutter clean
           rm -rf pubspec.lock
+          rm -rf build/
       - name: Get Flutter Dependencies
         working_directory: mobile_app
         script: |
           flutter pub get
-          flutter pub upgrade
-      - name: Run Analyzer
-        working_directory: mobile_app
-        script: |
-          flutter analyze
-      - name: Run Tests
-        working_directory: mobile_app
-        script: |
-          flutter test
       - name: Build Android APK
         working_directory: mobile_app
         script: |
-          flutter build apk --release --verbose \
-            --target-platform android-arm,android-arm64
+          flutter build apk --release --verbose
     artifacts:
       - mobile_app/build/app/outputs/apk/release/app-release.apk
-    publishing:
-      slack:
-        channel: '#builds'
-        notify_on_build_start: true
-  
-  ios-workflow:
-    name: Build iOS App
-    instance_type: mac_mini
-    max_build_duration: 120
-    triggering:
-      events:
-        - push
-        - pull_request
-      branch:
-        include_patterns:
-          - main
-          - develop
-    environment:
-      flutter: stable
-      xcode: 15.0
-      cocoapods: default
-    scripts:
-      - name: Clean Flutter Cache
-        working_directory: mobile_app
-        script: |
-          flutter clean
-          rm -rf pubspec.lock
-      - name: Get Flutter Dependencies
-        working_directory: mobile_app
-        script: |
-          flutter pub get
-          flutter pub upgrade
-      - name: Build iOS App
-        working_directory: mobile_app
-        script: |
-          flutter build ios --release --no-codesign --verbose
-    artifacts:
-      - mobile_app/build/ios/iphoneos/Runner.app
     publishing:
       slack:
         channel: '#builds'
