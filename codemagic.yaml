@@ -1,15 +1,7 @@
-workflows:
-  default:
-    name: Flutter Build
-    instance_type: mac_mini_m2
-    environment:
-      flutter: stable
-    scripts:
-      - name: Get Flutter packages
-        working_directory: mobile_app
-        script: flutter pub get
-      - name: Build Android APK
-        working_directory: mobile_app
-        script: flutter build apk --debug
-    artifacts:
-      - mobile_app/build/app/outputs/flutter-apk/*.apk
+scripts:
+  - name: Flutter pub get
+    working_directory: mobile_app
+    script: flutter pub get
+  - name: Build Android APK
+    working_directory: mobile_app
+    script: flutter build apk --release
