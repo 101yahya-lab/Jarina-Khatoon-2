@@ -23,7 +23,7 @@ dependencies:
   # Media
   image_picker: 1.0.4
   file_picker: 6.1.1
-  permission_handler: 11.4.4
+  permission_handler: 12.0.3
 
 dev_dependencies:
   flutter_test:
