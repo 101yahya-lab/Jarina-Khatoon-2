@@ -1,11 +1,17 @@
 {
   "name": "hasan-babu-clinic-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Backend API for Hasan Babu Ka Aspataal Clinic Management System",
   "main": "server.js",
+  "private": true,
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "restart": "npm run start",
+    "test": "node -e \"console.log('No tests configured')\""
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
