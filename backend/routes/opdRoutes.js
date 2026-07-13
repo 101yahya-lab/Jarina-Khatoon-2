@@ -1,20 +1,70 @@
-const express = require('express'); // 'Const' को बदलकर 'const' किया
+const express = require('express');
 const router = express.Router();
-// यहाँ verifyToken के साथ allowRoles को भी इम्पोर्ट किया
+
 const { verifyToken, allowRoles } = require('../middleware/authMiddleware');
+
 const {
   checkinPatient,
   getQueue,
   savePrescription
 } = require('../controllers/opdController');
 
-// 1. मरीज को OPD लाइन में सिर्फ Admin या Receptionist ही लगा सकते हैं
-router.post('/checkin', verifyToken, allowRoles('admin', 'reception'), checkinPatient);
+// ========================================
+// OPD API Status
+// ========================================
+router.get('/status', (req, res) => {
+  return res.status(200).json({
+    success: true,
+    service: 'OPD API',
+    status: 'Running',
+    timestamp: new Date()
+  });
+});
 
-// 2. आज की वेटिंग लिस्ट Admin, Reception और Doctor तीनों देख सकते हैं
-router.get('/queue', verifyToken, allowRoles('admin', 'reception', 'doctor'), getQueue);
+// ========================================
+// Check-In Patient
+// POST /api/opd/checkin
+// Admin + Reception
+// ========================================
+router.post(
+  '/checkin',
+  verifyToken,
+  allowRoles('admin', 'reception'),
+  checkinPatient
+);
 
-// 3. मरीज का पर्चा (Prescription) सिर्फ और सिर्फ DOCTOR ही सेव कर सकता है
-router.put('/:visit_id/prescription', verifyToken, allowRoles('doctor'), savePrescription);
+// ========================================
+// Today's Queue
+// GET /api/opd/queue
+// Admin + Reception + Doctor
+// ========================================
+router.get(
+  '/queue',
+  verifyToken,
+  allowRoles('admin', 'reception', 'doctor'),
+  getQueue
+);
+
+// ========================================
+// Save Prescription
+// PUT /api/opd/:visit_id/prescription
+// Doctor Only
+// ========================================
+router.put(
+  '/:visit_id/prescription',
+  verifyToken,
+  allowRoles('doctor'),
+  savePrescription
+);
+
+// ========================================
+// Invalid OPD Route
+// ========================================
+router.all('*', (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: 'OPD route not found.'
+  });
+});
 
 module.exports = router;
