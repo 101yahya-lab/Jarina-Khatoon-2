@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-// यहाँ verifyToken के साथ allowRoles को भी इम्पोर्ट कर लिया
+
 const { verifyToken, allowRoles } = require('../middleware/authMiddleware');
+
 const {
   registerPatient,
   getAllPatients,
@@ -10,20 +11,73 @@ const {
 } = require('../controllers/patientController');
 
 // ========================================
-// Patient Routes (Token + Role Protected)
+// Patient API Status
 // ========================================
+router.get('/status', (req, res) => {
+  return res.status(200).json({
+    success: true,
+    service: 'Patient API',
+    status: 'Running',
+    timestamp: new Date()
+  });
+});
 
-// 1. नया पेशेंट सिर्फ Admin और Receptionist ही रजिस्टर कर सकते हैं
-router.post('/', verifyToken, allowRoles('admin', 'reception'), registerPatient);
+// ========================================
+// Register New Patient
+// POST /api/patients
+// Admin + Reception
+// ========================================
+router.post(
+  '/',
+  verifyToken,
+  allowRoles('admin', 'reception'),
+  registerPatient
+);
 
-// 2. आज की Queue को Admin, Reception और Doctor तीनों देख सकते हैं
-// (नोट: /today-queue को /:hba_id से ऊपर रखना जरूरी था, जो आपने बिल्कुल सही किया है)
-router.get('/today-queue', verifyToken, allowRoles('admin', 'reception', 'doctor'), getTodayQueue);
+// ========================================
+// Today's Queue
+// GET /api/patients/today-queue
+// Admin + Reception + Doctor
+// ========================================
+router.get(
+  '/today-queue',
+  verifyToken,
+  allowRoles('admin', 'reception', 'doctor'),
+  getTodayQueue
+);
 
-// 3. सभी पेशेंट्स की लिस्ट देखने की परमिशन
-router.get('/', verifyToken, allowRoles('admin', 'reception', 'doctor'), getAllPatients);
+// ========================================
+// Get All Patients
+// GET /api/patients
+// Admin + Reception + Doctor
+// ========================================
+router.get(
+  '/',
+  verifyToken,
+  allowRoles('admin', 'reception', 'doctor'),
+  getAllPatients
+);
 
-// 4. किसी खास पेशेंट का डेटा HBA ID से निकालना
-router.get('/:hba_id', verifyToken, allowRoles('admin', 'reception', 'doctor'), getPatientByHbaId);
+// ========================================
+// Get Patient By HBA ID
+// GET /api/patients/:hba_id
+// Admin + Reception + Doctor
+// ========================================
+router.get(
+  '/:hba_id',
+  verifyToken,
+  allowRoles('admin', 'reception', 'doctor'),
+  getPatientByHbaId
+);
+
+// ========================================
+// Invalid Patient Route
+// ========================================
+router.all('*', (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: 'Patient route not found.'
+  });
+});
 
 module.exports = router;
