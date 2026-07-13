@@ -1,7 +1,18 @@
-const express = require('express'); // 'Const' को बदलकर 'const' किया
+const express = require('express');
 const pool = require('./config/db');
 const cors = require('cors');
 require('dotenv').config();
+
+// ========================================
+// JWT_SECRET Check (Fail Fast)
+// ========================================
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === '') {
+  console.error('\n====================================================');
+  console.error('❌ ERROR: JWT_SECRET is missing in your .env file');
+  console.error('👉 Please add: JWT_SECRET=your_super_secret_key');
+  console.error('====================================================\n');
+  process.exit(1);
+}
 
 const authRoutes = require('./routes/authRoutes');
 const patientRoutes = require('./routes/patientRoutes');
@@ -10,24 +21,23 @@ const opdRoutes = require('./routes/opdRoutes');
 const app = express();
 
 // ========================================
-// CORS Configuration - Hospital Network ke liye optimized
+// CORS Configuration
 // ========================================
 const corsOptions = {
   origin: function (origin, callback) {
-    // Saari requests ko allow karo (hospital network ke liye)
     callback(null, true);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
-  maxAge: 86400 // 24 hours cache
+  maxAge: 86400
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Preflight requests ke liye
+app.options('*', cors(corsOptions));
 
 // ========================================
-// डेटाबेस कनेक्शन (Pool Verification)
+// Database Connection Check
 // ========================================
 (async () => {
   try {
@@ -40,16 +50,14 @@ app.options('*', cors(corsOptions)); // Preflight requests ke liye
   }
 })();
 
-// (नोट: यहाँ से क्रैश करने वाले पुराने connection.connect और connection.on ब्लॉक हटा दिए गए हैं)
-
 // ========================================
 // Middleware
 // ========================================
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-app.use(express.static('public')); // यह आपकी public फोल्डर की HTML फाइलों को चलाएगा
+app.use(express.static('public'));
 
-// Request logging middleware (Termianl me live request dekhne ke liye)
+// Request Logging
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
@@ -71,31 +79,36 @@ app.get('/health', (req, res) => {
   res.json({
     success: true,
     message: 'Server healthy hai',
-    timestamp: new Date()
+    timestamp: new Date(),
+    jwt: 'Configured'
   });
 });
 
 // ========================================
-// Routes Application
+// API Routes
 // ========================================
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/opd', opdRoutes);
 
 // ========================================
-// Error Handling Middleware
+// Error Handler
 // ========================================
 app.use((err, req, res, next) => {
   console.error('❌ Server Error:', err);
-  res.status(500).json({
+
+  res.status(err.status || 500).json({
     success: false,
-    message: 'Server me dikkat aa gayi',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error'
+    message: err.message || 'Server me dikkat aa gayi',
+    error:
+      process.env.NODE_ENV === 'development'
+        ? err.stack
+        : 'Internal Server Error'
   });
 });
 
 // ========================================
-// 404 Handler (Galat URL ke liye)
+// 404 Handler
 // ========================================
 app.use((req, res) => {
   res.status(404).json({
@@ -105,18 +118,18 @@ app.use((req, res) => {
 });
 
 // ========================================
-// सर्वर चालू करना
+// Start Server
 // ========================================
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 app.listen(PORT, HOST, () => {
-  console.log(`\n${'='.repeat(60)}`);
-  console.log(`🚀 Server chal raha hai!`);
+  console.log('\n====================================================');
+  console.log('🚀 Hasan Babu Hospital Server Started Successfully');
   console.log(`📡 URL: http://${HOST}:${PORT}`);
-  console.log(`🏥 API Endpoint: http://${HOST}:${PORT}/api`);
-  console.log(`❤️  Health Check: http://${HOST}:${PORT}/health`);
-  console.log(`${'='.repeat(60)}\n`);
+  console.log(`🏥 API: http://${HOST}:${PORT}/api`);
+  console.log(`❤️ Health: http://${HOST}:${PORT}/health`);
+  console.log('====================================================\n');
 });
 
 module.exports = app;
