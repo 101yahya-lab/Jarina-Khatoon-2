@@ -1,0 +1,14 @@
+workflows:
+  android-workflow:
+    name: Hasan Babu Clinic Android Build
+    environment:
+      flutter: stable
+    scripts:
+      - name: Flutter pub get
+        working_directory: mobile_app
+        script: flutter pub get
+      - name: Build Android APK
+        working_directory: mobile_app
+        script: flutter build apk --release
+    artifacts:
+      - mobile_app/build/app/outputs/**/*.apk
