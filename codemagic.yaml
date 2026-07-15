@@ -4,9 +4,6 @@ workflows:
     environment:
       flutter: stable
     scripts:
-      - name: Generate missing platform folders
-        working_directory: mobile_app
-        script: flutter create . --platforms=android
       - name: Flutter pub get
         working_directory: mobile_app
         script: flutter pub get
